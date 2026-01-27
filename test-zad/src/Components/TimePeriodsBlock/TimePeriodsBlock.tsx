@@ -16,13 +16,15 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const count = periods.length;
   const step = 360 / count;
-  const radius = 237; // (530 / 2) - 28
+  const circleRadius = 265; // Радиус круга (530px / 2)
+  const pointRadius = 266; // Расстояние от центра до центра точки
+
+  // Угол для первой точки (12 часов = 90°, но нам нужно немного сместить)
+  const startAngleOffset = 330 - step / 2; // Чтобы точки были равномерно распределены
 
   const pointsRef = useRef<HTMLDivElement>(null);
   const numbersRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
-
-  const labelAngles = useRef<(number | null)[]>([]);
 
   useEffect(() => {
     if (!pointsRef.current || !numbersRef.current || !sliderRef.current) return;
@@ -50,10 +52,6 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
     );
   }, [activeIndex, step]);
 
-  useEffect(() => {
-    labelAngles.current = periods.map((_, index) => step * index);
-  }, [periods, step]);
-
   return (
     <section className="time-periods">
       {/* Header */}
@@ -70,39 +68,60 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
         <div className="circle-axis" />
         {/* Horizontal axis */}
         <div className="circle-axis circle-axis--horizontal" />
-        {/* Rotating points layer */}
-        <div className="circle-points" ref={pointsRef}>
-          {periods.map((period, index) => {
-            const angle = step * index;
-            const isActive = index === activeIndex;
 
-            return (
-              <div
-                key={period.id}
-                className={"circle-point" + (isActive ? " is-active" : "")}
-                style={{
-                  transform: `rotate(${angle}deg) translate(${radius}px) rotate(-${angle}deg)`,
-                }}
-                onClick={() => setActiveIndex(index)}
-              >
-                <span className="circle-point__dot">
-                  {isActive && (
-                    <span className="circle-point__id">{index + 1}</span>
-                  )}
-                </span>
-                {isActive && (
-                  <span className="circle-point__label">{period.label}</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
         {/* Center numbers */}
         <div className="circle-numbers" ref={numbersRef}>
           <span className="circle-numbers__from">
             {periods[activeIndex].from}
           </span>
           <span className="circle-numbers__to">{periods[activeIndex].to}</span>
+        </div>
+
+        {/* Rotating points layer */}
+        <div className="circle-points" ref={pointsRef}>
+          {periods.map((period, index) => {
+            // Рассчитываем угол для каждой точки
+            const angle = startAngleOffset + step * index;
+            const isActive = index === activeIndex;
+
+            // Преобразуем угол в радианы
+            const radian = (angle * Math.PI) / 180;
+
+            // Рассчитываем координаты на окружности
+            // Используем тригонометрию для круга
+            const x = Math.cos(radian) * pointRadius; // X = cos(угол) * радиус
+            const y = Math.sin(radian) * pointRadius; // Y = sin(угол) * радиус
+
+
+            return (
+              <div
+                key={period.id}
+                className={"circle-point" + (isActive ? " is-active" : "")}
+                style={{
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                }}
+                onClick={() => setActiveIndex(index)}
+              >
+                <span className="circle-point__dot">
+                  {isActive && (
+                    <div
+                      className="circle-point__content"
+                      style={{
+                        transform: `rotate(${step * activeIndex}deg)`,
+                        transformOrigin: "left center", // Вращаем относительно левого края
+                      }}
+                    >
+                      <span className="circle-point__id">{index + 1}</span>
+                      <span className="circle-point__label">
+                        {period.label}
+                      </span>
+                    </div>
+                  )}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
