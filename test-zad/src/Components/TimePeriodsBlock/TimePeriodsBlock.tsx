@@ -14,13 +14,13 @@ interface Props {
 
 export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [showLabel, setShowLabel] = useState(false);
   const count = periods.length;
   const step = 360 / count;
-  const circleRadius = 265; // Радиус круга (530px / 2)
-  const pointRadius = 266; // Расстояние от центра до центра точки
-
-  // Угол для первой точки (12 часов = 90°, но нам нужно немного сместить)
-  const startAngleOffset = 330 - step / 2; // Чтобы точки были равномерно распределены
+  const circleRadius = 265;
+  const pointRadius = 266;
+  const startAngleOffset = 330 - step / 2;
 
   const pointsRef = useRef<HTMLDivElement>(null);
   const numbersRef = useRef<HTMLDivElement>(null);
@@ -50,7 +50,30 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
       { opacity: 1, y: 0, duration: 0.4 },
       "-=0.2"
     );
+
+    // Анимация появления label через секунду
+    setShowLabel(false);
+    const timer = setTimeout(() => {
+      setShowLabel(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [activeIndex, step]);
+
+  const handlePointClick = (index: number) => {
+    setActiveIndex(index);
+    setHoveredIndex(null); // Сбрасываем hover при клике
+  };
+
+  const handlePointMouseEnter = (index: number) => {
+    if (index !== activeIndex) {
+      setHoveredIndex(index);
+    }
+  };
+
+  const handlePointMouseLeave = () => {
+    setHoveredIndex(null);
+  };
 
   return (
     <section className="time-periods">
@@ -80,45 +103,48 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
         {/* Rotating points layer */}
         <div className="circle-points" ref={pointsRef}>
           {periods.map((period, index) => {
-            // Рассчитываем угол для каждой точки
             const angle = startAngleOffset + step * index;
             const isActive = index === activeIndex;
+            const isHovered = hoveredIndex === index;
+            const shouldShowLabel = isActive && showLabel;
 
-            // Преобразуем угол в радианы
             const radian = (angle * Math.PI) / 180;
-
-            // Рассчитываем координаты на окружности
-            // Используем тригонометрию для круга
-            const x = Math.cos(radian) * pointRadius; // X = cos(угол) * радиус
-            const y = Math.sin(radian) * pointRadius; // Y = sin(угол) * радиус
-
+            const x = Math.cos(radian) * pointRadius;
+            const y = Math.sin(radian) * pointRadius;
 
             return (
               <div
                 key={period.id}
-                className={"circle-point" + (isActive ? " is-active" : "")}
+                className={`circle-point ${isActive ? "is-active" : ""} ${
+                  isHovered ? "is-hovered" : ""
+                }`}
                 style={{
                   left: `calc(50% + ${x}px)`,
                   top: `calc(50% + ${y}px)`,
                 }}
-                onClick={() => setActiveIndex(index)}
+                onClick={() => handlePointClick(index)}
+                onMouseEnter={() => handlePointMouseEnter(index)}
+                onMouseLeave={handlePointMouseLeave}
               >
                 <span className="circle-point__dot">
-                  {isActive && (
-                    <div
-                      className="circle-point__content"
-                      style={{
-                        transform: `rotate(${step * activeIndex}deg)`,
-                        transformOrigin: "left center", // Вращаем относительно левого края
-                      }}
-                    >
-                      <span className="circle-point__id">{index + 1}</span>
-                      <span className="circle-point__label">
-                        {period.label}
-                      </span>
-                    </div>
+                  {(isActive || isHovered) && (
+                    <span className="circle-point__id">{index + 1}</span>
                   )}
                 </span>
+
+                {/* Label показывается только для активной точки после задержки */}
+                {shouldShowLabel && (
+                  <div
+                    className="circle-point__label-wrapper"
+                    style={
+                      {
+                        "--compensation-angle": `${step * activeIndex}deg`,
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span className="circle-point__label">{period.label}</span>
+                  </div>
+                )}
               </div>
             );
           })}
