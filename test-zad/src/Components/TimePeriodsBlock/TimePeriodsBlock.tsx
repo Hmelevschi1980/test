@@ -9,6 +9,8 @@ import "swiper/css/pagination";
 import "./TimePeriodsBlock.scss";
 import ArrowLeft from "../assets/arrowLeft.svg"
 import ArrowRight from "../assets/arrowRight.svg"
+import type { Swiper as SwiperType } from "swiper";
+
 
 interface Props {
   periods: TimePeriod[];
@@ -32,6 +34,8 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
   const sliderRef = useRef<HTMLDivElement>(null);
   const fromRef = useRef<HTMLSpanElement>(null);
   const toRef = useRef<HTMLSpanElement>(null);
+  const prevRef = useRef<HTMLButtonElement | null>(null);
+  const nextRef = useRef<HTMLButtonElement | null>(null);
 
   // Функция для анимации счетчика
   const animateCounter = (targetFrom: number, targetTo: number) => {
@@ -123,6 +127,9 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
     setHoveredIndex(null);
   };
 
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
+
   return (
     <section className="time-periods">
       {/* Контейнер для заголовка и круга на одном уровне */}
@@ -187,7 +194,16 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
 
                   {shouldShowLabel && (
                     <div className="circle-point__label-wrapper">
-                      <span className="circle-point__label">
+                      <span
+                        className="circle-point__label"
+                        style={
+                          {
+                            left: `calc(50% + ${x}px)`,
+                            top: `calc(50% + ${y}px)`,
+                            "--counter-rotation": `${step * activeIndex}deg`,
+                          } as React.CSSProperties
+                        }
+                      >
                         {period.label}
                       </span>
                     </div>
@@ -225,15 +241,47 @@ export const TimePeriodsBlock: React.FC<Props> = ({ periods }) => {
           </button>
         </div>
       </div>
+
       {/* Slider */}
       <div className="time-periods__slider" ref={sliderRef}>
+        <div className="slider-nav">
+          <button
+            ref={prevRef}
+            className={`slider-nav__btn slider-nav__btn--prev ${
+              isBeginning ? "is-hidden" : ""
+            }`}
+          >
+            <img src={ArrowLeft} alt="Назад" />
+          </button>
+
+          <button
+            ref={nextRef}
+            className={`slider-nav__btn slider-nav__btn--next ${
+              isEnd ? "is-hidden" : ""
+            }`}
+          >
+            <img src={ArrowRight} alt="Вперед" />
+          </button>
+        </div>
+
         <Swiper
-          key={activeIndex}
           modules={[Navigation, Pagination]}
           slidesPerView={3}
           spaceBetween={25}
-          navigation
           pagination={{ clickable: true }}
+          navigation={{
+            prevEl: prevRef.current,
+            nextEl: nextRef.current,
+          }}
+          onBeforeInit={(swiper: SwiperType) => {
+            // КЛЮЧЕВОЙ МОМЕНТ
+            swiper.params.navigation!.prevEl = prevRef.current;
+            swiper.params.navigation!.nextEl = nextRef.current;
+          }}
+          onSlideChange={(swiper: SwiperType) => {
+            setIsBeginning(swiper.isBeginning);
+            setIsEnd(swiper.isEnd);
+          }}
         >
           {periods[activeIndex].events.map((event, idx) => (
             <SwiperSlide key={idx}>
