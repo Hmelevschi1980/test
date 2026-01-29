@@ -141,6 +141,7 @@ function App() {
   return (
     <div className="App">
       <TimePeriodsBlock periods={periodsData} />
+      <TimePeriodsBlock periods={periodsData.slice(0, 2)} />
     </div>
   );
 }

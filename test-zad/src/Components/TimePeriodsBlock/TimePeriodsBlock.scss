@@ -8,7 +8,14 @@
     flex-direction: column;
 }
 
-/* Контейнер для заголовка и круга на одном уровне */
+.time-periods__mobile {
+    display: none;
+}
+
+.time-periods__desktop {
+    display: block;
+}
+
 .time-periods__top-section {
     display: flex;
     align-items: flex-start;
@@ -18,7 +25,6 @@
     width: 100%;
 }
 
-/* Заголовок слева */
 .time-periods__header {
     display: flex;
     align-items: flex-start;
@@ -50,7 +56,6 @@
     padding-top: 0;
 }
 
-/* Круг по центру */
 .time-periods__circle-wrapper {
     position: relative;
     width: 530px;
@@ -70,6 +75,7 @@
     border-radius: 50%;
     background: transparent;
 }
+
 .circle-axis {
     position: absolute;
     top: 50%;
@@ -221,7 +227,7 @@
     font-size: 200px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #EF5DA8;
+    color: #5D5FEF;
 }
 
 .circle-numbers__to {
@@ -231,7 +237,7 @@
     font-size: 200px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #5D5FEF;
+    color: #EF5DA8;
 }
 
 .time-periods__slider {
@@ -413,4 +419,188 @@
         height: 14px;
         pointer-events: none;
     }
+}
+
+@media (max-width: 767px) {
+    .time-periods__desktop {
+        display: none;
+    }
+
+    .time-periods__mobile {
+        display: block;
+    }
+
+
+.time-periods__mobile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.time-periods__mobile-wrapper {
+    width: 320px;
+    height: 568px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.time-periods__mobile-title {
+    font-family: "PT Sans", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #42567a;
+    line-height: 1.2;
+    margin: 0 0 32px 0;
+}
+
+.time-periods__mobile-years {
+    display: flex;
+        justify-content: center;
+        gap: 12px;
+        font-family: "PT Sans", sans-serif;
+        font-size: 56px;
+        font-weight: 700;
+        margin-bottom: 56px;
+    }
+
+.time-periods__mobile-years > .from {
+        color: #5D5FEF;
+    }
+
+.time-periods__mobile-years > .to {
+        color: #EF5DA8;
+    }
+
+.time-periods__mobile-label {
+    display: block;
+    text-align: start;
+    font-family: "PT Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #42567a;
+    margin-bottom: 20px;
+}
+
+.time-periods__divider {
+    width: 280px;
+    height: 1px;
+    background-color: #c7cdd9;
+    margin: 0 auto 20px;
+}
+
+.time-periods__mobile-slider {
+    height: 114px;
+    margin-bottom: 78px;
+}
+
+.time-periods__mobile-controls {
+    display: flex;
+    align-items: center;
+}
+
+.mobile-dots {
+    display: flex;
+    gap: 10px;
+    margin-left: 38px;
+    margin-top: 25px;
+}
+
+.mobile-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(66, 86, 122, 0.4);
+    cursor: pointer;
+}
+
+.mobile-dot.is-active {
+    background: rgba(66, 86, 122, 1);
+}
+
+.period-controls-mobile {
+    width: 58px;
+    height: 49px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.period-controls__mobile-counter {
+    font-family: 'PT Sans', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+
+    color: #42567a;
+}
+
+.period-controls__mobile-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.period-controls__mobile-btn {
+    width: 25px;
+    height: 25px;
+
+    border-radius: 50%;
+    border: 1px solid rgba(66, 86, 122, 0.5);
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    cursor: pointer;
+
+    transition: border-color 0.2s ease, transform 0.15s ease;
+
+    &:hover {
+        border-color: #42567a;
+    }
+
+    &:active {
+        transform: scale(0.92);
+    }
+
+    img {
+        width: 14px;
+        height: 14px;
+        pointer-events: none;
+    }
+}
+
+.time-periods__mobile-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* или другое выравнивание */
+    gap: 20px;
+    /* отступ между блоками */
+    width: 100%;
+    /* или нужная ширина */
+}
+
+.event-mobile {
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.event__year-mobile {
+    font-size: 16px;
+    font-weight: 700;
+    color: #5e7cff;
+    margin-bottom: 15px;
+}
+
+.event__description-mobile {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #42567a;
+}
+
 }
